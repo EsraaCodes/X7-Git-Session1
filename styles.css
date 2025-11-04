@@ -16,6 +16,39 @@
     --body-gradient-2: #1e1e1e;
 }
 
+/* Theme toggle button (floating) */
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 2200;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.theme-toggle:focus {
+    outline: 2px solid rgba(59,130,246,0.25);
+}
+
+.theme-toggle .moon-icon { display: none; }
+.theme-toggle .sun-icon  { display: inline-block; }
+
+/* When dark theme is active, show moon icon and hide sun */
+[data-theme="dark"] .theme-toggle .moon-icon { display: inline-block; }
+[data-theme="dark"] .theme-toggle .sun-icon  { display: none; }
+
+/* Slight background in dark mode for the toggle */
+[data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.02); }
+
 * {
     margin: 0;
     padding: 0;
@@ -24,8 +57,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: #333;
+    background: linear-gradient(135deg, var(--body-gradient-1) 0%, var(--body-gradient-2) 100%);
+    color: var(--text-color);
     overflow-x: hidden;
     overflow-y: auto;
     margin: 0;
@@ -41,12 +74,12 @@ body {
 }
 
 .slide {
-    background: #ffffff;
+    background: var(--slide-bg);
     border-radius: 15px;
     padding: 60px 80px;
     margin-bottom: 60px;
     min-height: 85vh;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 40px var(--slide-shadow);
     border-left: 5px solid #2563eb;
     animation: slideIn 0.5s ease-out;
     display: flex;
@@ -69,8 +102,7 @@ body {
     }
 }
 
-h1 {
-    color: #1e40af;
+h1, h2, h3 {
     font-size: 3em;
     margin-bottom: 40px;
     text-align: center;
@@ -79,7 +111,6 @@ h1 {
 }
 
 h2 {
-    color: #1e3a8a;
     font-size: 2.5em;
     margin-bottom: 35px;
     border-left: 5px solid #dc2626;
@@ -87,9 +118,13 @@ h2 {
 }
 
 h3 {
-    color: #1d4ed8;
     font-size: 1.8em;
     margin: 30px 0 20px 0;
+}
+
+/* Use the global text color for headings so they adapt in dark mode */
+h1, h2, h3 {
+    color: var(--text-color);
 }
 
 p, li {

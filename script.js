@@ -152,6 +152,77 @@ function loadStudentInfo() {
     }
 }
 
+// =====================
+// Dark mode / Theme utils
+// =====================
+const THEME_KEY = 'site-theme-preference';
+
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        const btn = document.getElementById('theme-toggle');
+        if (btn) btn.setAttribute('aria-pressed', 'true');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        const btn = document.getElementById('theme-toggle');
+        if (btn) btn.setAttribute('aria-pressed', 'false');
+    }
+}
+
+function toggleTheme() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    applyTheme(newTheme);
+    try {
+        localStorage.setItem(THEME_KEY, newTheme);
+    } catch (e) {
+        console.warn('Could not persist theme preference', e);
+    }
+}
+
+function initTheme() {
+    try {
+        const saved = localStorage.getItem(THEME_KEY);
+        if (saved) {
+            applyTheme(saved);
+            return;
+        }
+    } catch (e) {
+        console.warn('Error reading theme preference', e);
+    }
+
+    // Fallback to system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme('dark');
+    } else {
+        applyTheme('light');
+    }
+
+    // Listen for system preference changes
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            // Only change if user hasn't explicitly chosen a theme
+            try {
+                const saved = localStorage.getItem(THEME_KEY);
+                if (!saved) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            } catch (ex) {
+                console.warn('Error reading theme preference', ex);
+            }
+        });
+    }
+
+    // Wire up toggle button
+    const toggleBtn = document.getElementById('theme-toggle');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleTheme);
+        // Ensure aria-pressed reflects current state
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        toggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+    }
+}
+
 // Scrollable presentation with custom terminal
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content Loaded - Initializing presentation');
@@ -173,6 +244,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize all terminals immediately
     initializeAllTerminals();
+    // Initialize theme (dark / light) after DOM is ready
+    try {
+        initTheme();
+    } catch (e) {
+        console.warn('initTheme failed', e);
+    }
 });
 
 // Initialize all terminals on page load
